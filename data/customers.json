@@ -1,0 +1,10 @@
+[{
+  "id": "123",
+  "productsPurchased": ["abc"]
+}, {
+  "id": "456",
+  "productsPurchased": ["abc", "def"]
+}, {
+  "id": "789",
+  "productsPurchased": []
+}]

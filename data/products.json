@@ -1,0 +1,10 @@
+[{
+  "id": "abc",
+  "purchasedBy": ["123", "456"]
+}, {
+  "id": "def",
+  "purchasedBy": ["456"]
+}, {
+  "id": "ghi",
+  "purchasedBy": []
+}]
