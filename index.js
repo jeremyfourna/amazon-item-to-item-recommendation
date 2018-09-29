@@ -1,7 +1,10 @@
 const {
+  __,
+  append,
   assoc,
   compose,
   concat,
+  contains,
   evolve,
   filter,
   find,
@@ -24,7 +27,32 @@ For each item in product catalog, I1
       Compute the similarity between I1 and I2
 */
 
+// OK
+function itemRelationToCustomerPurchases(product, customer) {
+  return filter(
+    productId => productId !== product.id,
+    customer.productsPurchased
+  );
+}
 
+// OK
+function findCustomersWhoPurchasedItem(customers, product) {
+  return filter(
+    customer => contains(product.id, customer.productsPurchased),
+    customers
+  );
+}
+
+// OK
+function assignCustomersToProduct(product, customers) {
+  return compose(
+    assoc('purchasedBy', __, product),
+    reduce((prev, customer) => append(customer.id, prev), []),
+    filter(customer => contains(product.id, customer.productsPurchased))
+  )(customers);
+}
+
+// Fail
 function itemToItemReco(products, customers) {
   return reduce((table, product) => {
     const itemsLinkedToProduct = map(customer => {
@@ -41,6 +69,7 @@ function itemToItemReco(products, customers) {
   }, prepareResult(products), products);
 }
 
+// Fail
 function prepareResult(products) {
   return reduce((prev, cur) => {
     return assoc(cur.id, [], prev);
@@ -48,7 +77,9 @@ function prepareResult(products) {
 }
 
 
-const result = itemToItemReco(products, customers);
+//const result = itemToItemReco(products, customers);
 
-
-console.log(result);
+//console.log(itemRelationToCustomerPurchases(products[0], customers[1]));
+//console.log(findCustomersWhoPurchasedItem(customers, products[2]));
+//console.log(assignCustomersToProduct(products[0], customers));
+//console.log(result);

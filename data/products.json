@@ -1,10 +1,7 @@
 [{
-  "id": "abc",
-  "purchasedBy": ["123", "456"]
+  "id": "abc"
 }, {
-  "id": "def",
-  "purchasedBy": ["456"]
+  "id": "def"
 }, {
-  "id": "ghi",
-  "purchasedBy": []
+  "id": "ghi"
 }]
