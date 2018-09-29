@@ -8,10 +8,15 @@ const {
   evolve,
   filter,
   find,
+  forEach,
+  length,
+  lte,
   map,
+  pair,
   prop,
   propEq,
-  reduce
+  reduce,
+  unnest
 } = require('ramda');
 const products = require('./data/products.json');
 const customers = require('./data/customers.json');
@@ -36,7 +41,7 @@ function itemRelationToCustomerPurchases(product, customer) {
 }
 
 // OK
-function findCustomersWhoPurchasedItem(customers, product) {
+function findCustomersWhoPurchasedProduct(product, customers) {
   return filter(
     customer => contains(product.id, customer.productsPurchased),
     customers
@@ -54,19 +59,32 @@ function assignCustomersToProduct(product, customers) {
 
 // Fail
 function itemToItemReco(products, customers) {
-  return reduce((table, product) => {
-    const itemsLinkedToProduct = map(customer => {
-      return compose(
-        filter(p => p !== product.id),
-        prop('productsPurchased'),
-        find(propEq('id', customer))
-      )(customers);
-    }, product.purchasedBy);
-    const transformations = {
-      [product.id]: concat(itemsLinkedToProduct)
-    };
-    return evolve(transformations, table);
-  }, prepareResult(products), products);
+  return forEach(product => {
+    const customersWhoBoughtSomethingElse = compose(
+      keepCustomersWhoBoughtSomeOtherProducts(product, __),
+      findCustomersWhoPurchasedProduct(product, __)
+    )(customers);
+    console.log('customersWhoBoughtSomethingElse', product.id, customersWhoBoughtSomethingElse);
+    const recordRelation = recordRelationbetweenItems(product, customersWhoBoughtSomethingElse);
+    console.log('recordRelation', product.id, recordRelation);
+  }, products);
+}
+
+function keepCustomersWhoBoughtSomeOtherProducts(product, customers) {
+  return filter(customer => lte(2, length(customer.productsPurchased)), customers);
+}
+
+function recordRelationbetweenItems(product, customers) {
+  return map(customer => {
+    const listOfProducts = itemRelationToCustomerPurchases(product, customer);
+    return compose(
+      reduce((prev, cur) => {
+        console.log(customer.id, cur);
+        return append(prev, cur);
+      }, []),
+      map(p => pair(product.id, p))
+    )(listOfProducts);
+  }, customers);
 }
 
 // Fail
@@ -77,9 +95,7 @@ function prepareResult(products) {
 }
 
 
-//const result = itemToItemReco(products, customers);
-
-//console.log(itemRelationToCustomerPurchases(products[0], customers[1]));
-//console.log(findCustomersWhoPurchasedItem(customers, products[2]));
+//console.log(itemRelationToCustomerPurchases(products[0], customers[3]));
+//console.log(findCustomersWhoPurchasedProduct(products[2], customers));
 //console.log(assignCustomersToProduct(products[0], customers));
-//console.log(result);
+console.log(itemToItemReco(products, customers));
